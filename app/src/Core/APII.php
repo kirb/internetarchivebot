@@ -3045,6 +3045,7 @@ class API {
 
 		foreach( $urls as $tid => $url ) {
 			$post['url'] = $url;
+			if ( IAVERBOSE ) echo "Archiving: $url\n";
 			for( $i = 0; $i <= 21; $i++ ) {
 				if( IAVERBOSE ) echo "Posting to $apiURL\n";
 
@@ -3066,8 +3067,10 @@ class API {
 				if( isset( $data['status'] ) ) {
 					if( $data['status'] == "error" ) {
 						if( $data['status_ext'] == "error:user-session-limit" ) {
+							if ( IAVERBOSE ) echo "Throttled\n";
 							sleep( 2 );
 						} else {
+							if ( IAVERBOSE ) echo "$url: " . $data['status_ext'] . "\n";
 							$returnArray[$tid]['success'] = false;
 							$returnArray[$tid]['error'] = $data;
 							switch( $data['status_ext'] ) {
@@ -3083,6 +3086,7 @@ class API {
 						}
 					}
 				} elseif( isset( $data['job_id'] ) ) {
+					if ( IAVERBOSE ) echo "$url: job " . $data['job_id'] . "\n";
 					$jobQueueData[$tid] = $data['job_id'];
 					break;
 				}
@@ -3108,12 +3112,14 @@ class API {
 				$data = json_decode( $data, true );
 
 				if( isset( $data['status'] ) ) {
+					if ( IAVERBOSE ) echo "{$urls[$tid]}: {$data['status']}\n";
 					if( $data['status'] == "success" ) {
 						$returnArray[$tid]['archive_url'] =
 							"https://web.archive.org/web/{$data['timestamp']}/{$data['original_url']}";
 						$returnArray[$tid]['archive_time'] = strtotime( $data['timestamp'] );
 						$returnArray[$tid]['success'] = true;
 						unset( $jobQueueData[$tid] );
+						if ( IAVERBOSE ) echo "Archive URL: " . $returnArray[$tid]['archive_url'] . "\n";
 					} elseif( $data['status'] == "error" ) {
 						$returnArray[$tid]['success'] = false;
 						$returnArray[$tid]['error'] = $data;
@@ -3133,6 +3139,8 @@ class API {
 						}
 						unset( $jobQueueData[$tid] );
 					}
+				} else {
+					if ( IAVERBOSE ) echo "{$urls[$tid]}: {$data}\n";
 				}
 			}
 		}
@@ -3331,7 +3339,7 @@ class API {
 				$tpost = implode( "\n", $post );
 				$tpost = str_replace( $bom, '', $tpost );
 				curl_setopt( self::$globalCurl_handle, CURLOPT_HEADER, 1 );
-				if( IAVERBOSE ) echo "Posting to $url\n";
+				if( IAVERBOSE ) echo "Posting to $url [$tpost]\n";
 				$metricsArray = [
 					'name'               => WIKIFARM,
 					'group_fields'       => [
