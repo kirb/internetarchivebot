@@ -1,3 +1,16 @@
+x-base: &base
+  build: .
+  volumes:
+    - ./app/src:/var/www
+    - ./php.ini:/usr/local/etc/php/conf.d/iabot.ini
+    - ./vendor:/vendor
+  environment:
+    - MYSQL_DB=iabot
+    - MYSQL_USER=iabot # Change to root for first run
+    - MYSQL_PASSWORD=5yBtFxeedrfupieNk7mp1oWyP8aR91kAp9nO8oSH
+    - MYSQL_ROOT_PASSWORD=5yBtFxeedrfupieNk7mp1oWyP8aR91kAp9nO8oSH
+  extra_hosts:
+    host.docker.internal: host-gateway
 volumes:
   db:
 services:
@@ -9,18 +22,10 @@ services:
       - MYSQL_ROOT_PASSWORD=5yBtFxeedrfupieNk7mp1oWyP8aR91kAp9nO8oSH
     volumes:
       - db:/var/lib/mysql
-  iabot:
-    build: .
+  main:
+    <<: *base
     ports:
       - "127.0.0.1:8080:80"
-    volumes:
-      - ./app/src:/var/www
-      - ./php.ini:/usr/local/etc/php/conf.d/iabot.ini
-      - ./vendor:/vendor
-    environment:
-      - MYSQL_DB=iabot
-      - MYSQL_USER=iabot # Change to root for first run
-      - MYSQL_PASSWORD=5yBtFxeedrfupieNk7mp1oWyP8aR91kAp9nO8oSH
-      - MYSQL_ROOT_PASSWORD=5yBtFxeedrfupieNk7mp1oWyP8aR91kAp9nO8oSH
-    extra_hosts:
-      host.docker.internal: host-gateway
+  availability:
+    <<: *base
+    entrypoint: php /var/www/availability.php
