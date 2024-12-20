@@ -10,6 +10,11 @@ $debugStyle = 20;   //Use an int to run through a limited amount of articles.  U
 // And write what would be edited on the page to stdout
 $testMode = false;
 
+// This is easier on Wayback Machine, because it can queue page saves until a later time when things
+// aren't as busy. However, the bot will not know whether the save was successful until it comes
+// across the same link again in a future run.
+$delayedAvailability = false;
+
 //Progress memory file.  This allows the bot to resume where it left off in the event of a shutdown or a crash.
 $memoryFile = "";
 //Wiki connection setup.  Keys are grouped in sets of 3, and given a name to be referred to by the wiki setup parameters.

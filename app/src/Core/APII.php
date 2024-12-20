@@ -3039,6 +3039,7 @@ class API {
 		$requestHeaders[] = "Authorization: LOW " . WAYBACKACCESSKEY . ":" . WAYBACKACCESSSECRET;
 		$requestHeaders[] = "Accept: application/json";
 		$post['capture_outlinks'] = 1;
+		if ( DELAYEDAVAILABILITY ) $post['delay_wb_availability'] = 1;
 
 		$apiURL = "https://web.archive.org/save";
 
@@ -3094,6 +3095,7 @@ class API {
 		$post = [];
 
 		while( !empty( $jobQueueData ) ) {
+			if ( DELAYEDAVAILABILITY ) break;
 			sleep( 2 );
 			foreach( $jobQueueData as $tid => $job ) {
 
